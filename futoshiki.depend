@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1476053968 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/main.cpp
+	<iostream>
+	"parser.h"
+
+1476051199 /home/alex/Documentos/USP/aa/futoshiki/futoshiki/parser.h
+	<cstdio>
+	<cstdlib>
+
+1476050960 /home/alex/Documentos/USP/aa/futoshiki/futoshiki/futoshiki.h
+	<cstdint>
+	<cstdlib>
+
+1476054190 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/parser.cpp
+	"parser.h"
+	"futoshiki.h"
+
