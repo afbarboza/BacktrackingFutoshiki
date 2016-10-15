@@ -3,6 +3,14 @@
 
 FILE *stream_input = NULL;
 
+int      number_case_test = 0;
+int      size_current_test = 0;
+int      number_current_restrictions = 0;
+uint8_t  **play_matrix = NULL;
+bool     **lines_map = NULL;
+bool     **columns_map = NULL;
+uint8_t  **line_restriction = NULL;
+uint8_t  **columns_restriction = NULL;
 
 #define END_OF_TESTS -1
 
@@ -81,26 +89,32 @@ void init_restrictions_map(void)
     int x1, y1, x2, y2;
 
     /*aloca as matrizes que representam restricoes nas mesmas linhas e nas mesmas colunas*/
-    line_restriction = (bool **) malloc(size_current_test * sizeof(bool *));
-    columns_restriction = (bool **) malloc(size_current_test * sizeof(bool *));
+    line_restriction = (uint8_t **) malloc(size_current_test * sizeof(uint8_t *));
+    columns_restriction = (uint8_t **) malloc(size_current_test * sizeof(uint8_t *));
 
     for (i = 0; i < size_current_test; i++) {
-        line_restriction[i] = (bool *) malloc(size_current_test * sizeof(bool));
-        columns_restriction[i] = (bool *) malloc(size_current_test * sizeof(bool));
+        line_restriction[i] = (uint8_t *) malloc(size_current_test * sizeof(uint8_t));
+        columns_restriction[i] = (uint8_t *) malloc(size_current_test * sizeof(uint8_t));
 
         for (j = 0; j < size_current_test; j++) {
-            line_restriction[i][j] = false;
-            columns_restriction[i][j] = false;
+            line_restriction[i][j] = NO_RESTRICTION;
+            columns_restriction[i][j] = NO_RESTRICTION;
         }
     }
 
     for (i = 0; i < number_current_restrictions; i++) {
         fscanf(stream_input, "%d %d %d %d", &x1, &y1, &x2, &y2);
-        printf("%d %d %d %d\n", x1, y1, x2, y2);
+        printf("%d %d %d %d\n", x1-1, y1-1, x2-1, y2-1);
         if (x1 == x2) { /* a restricao esta na mesma _linha_ */
-            line_restriction[x1 - 1][y1 - 1] = true;
+            if (y1 > y2)
+                line_restriction[x1 - 1][y1 - 1] = GREAT_RESTRICTION;
+            else
+                line_restriction[x1 - 1][y1 - 1] = LESS_RESTRICTION;
         } else if (y1 == y2) { /* a restricao esta na mesma _coluna_ */
-            columns_restriction[x1 - 1][y1 - 1] = true;
+            if (x1 > x2)
+                columns_restriction[x1 - 1][y1 - 1] = GREAT_RESTRICTION;
+            else
+                columns_restriction[x1 - 1][y1 - 1] = LESS_RESTRICTION;
         }
     }
 }
