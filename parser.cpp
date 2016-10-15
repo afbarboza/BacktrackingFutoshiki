@@ -3,14 +3,14 @@
 
 FILE *stream_input = NULL;
 
-int      number_case_test = 0;
-int      size_current_test = 0;
-int      number_current_restrictions = 0;
-uint8_t  **play_matrix = NULL;
-bool     **lines_map = NULL;
-bool     **columns_map = NULL;
-uint8_t  **line_restriction = NULL;
-uint8_t  **columns_restriction = NULL;
+int  number_case_test = 0;
+int  size_current_test = 0;
+int  number_current_restrictions = 0;
+int  **play_matrix = NULL;
+bool **lines_map = NULL;
+bool **columns_map = NULL;
+int  **line_restriction = NULL;
+int  **columns_restriction = NULL;
 
 #define END_OF_TESTS -1
 

@@ -1,13 +1,13 @@
 #include "futoshiki.h"
 
-extern int      number_case_test;
-extern int      size_current_test;
-extern int      number_current_restrictions;
-extern uint8_t  **play_matrix;
-extern bool     **lines_map;
-extern bool     **columns_map;
-extern uint8_t  **line_restriction;
-extern uint8_t  **columns_restriction;
+extern int  number_case_test;
+extern int  size_current_test;
+extern int  number_current_restrictions;
+extern int  **play_matrix;
+extern bool **lines_map;
+extern bool **columns_map;
+extern int  **line_restriction;
+extern int  **columns_restriction;
 
 /**
 * look_repetition_line - checa se ha numeros repetidos

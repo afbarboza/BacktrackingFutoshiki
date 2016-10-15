@@ -12,28 +12,28 @@
 #define GREAT_RESTRICTION   1
 #define LESS_RESTRICTION    2
 // number_case_test - numero de casos de teste do jogo
-int number_case_test = 0;
+extern int number_case_test;
 
 // size_current_test - dimensao do caso de teste atual
-int size_current_test = 0;
+extern int size_current_test;
 
 // number_current_restrictions - numero de restricoes para o caso de teste atual
-int number_current_restrictions = 0;
+extern int number_current_restrictions;
 
 // play_matrix - representa o tabuleiro do jogo
-int **play_matrix   = NULL;
+extern int **play_matrix;
 
 // lines_map - dado um numero, mapeia em quais linhas aquele numero ja foi usado.
-bool **lines_map        = NULL;
+extern bool **lines_map;
 
 // row_map - dado um numero, mapeia em quais colunas aquele numero ja foi usado.
-bool **columns_map      = NULL;
+extern bool **columns_map;
 
 // line_restriction - representa as restricoes de menor presentes nas linhas
-int **line_restriction = NULL;
+extern int **line_restriction;
 
 // columns_restriction - representa as restricoes de menor presentes nas colunas
-int **columns_restriction = NULL;
+extern int **columns_restriction;
 
 bool exist_less_greater(uint8_t value, int line, int column);
 
