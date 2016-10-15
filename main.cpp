@@ -4,16 +4,6 @@
 
 using namespace std;
 
-<<<<<<< HEAD
-extern int      number_case_test;
-extern int      size_current_test;
-extern int      number_current_restrictions;
-extern uint8_t  **play_matrix;
-extern bool     **lines_map;
-extern bool     **columns_map;
-extern uint8_t  **line_restriction;
-extern uint8_t  **columns_restriction;
-=======
 extern int number_case_test;
 extern int size_current_test;
 
@@ -25,7 +15,6 @@ extern int  **columns_restriction;
 
 
 bool SolveFutoshiki(int x, int y);
->>>>>>> sol_sem_poda
 
 int main(void)
 {
@@ -52,7 +41,6 @@ int main(void)
             printf("\n");
         }
 
-<<<<<<< HEAD
         //getchar();
         init_restrictions_map();
         init_lines_map();
@@ -63,7 +51,7 @@ int main(void)
         scanf("%d %d %d", &val, &l, &c);
         if (exist_less_greater(val, l, c) == true)
             cout << "hey... you cannot put these value there.\n" << endl;
-=======
+
         printf("\nMapa de linhas:\n");
         for (int i = 0; i < size_current_test; i++) {
             for (int j = 0; j < size_current_test; j++) {
@@ -99,13 +87,11 @@ int main(void)
         getchar();
 
         SolveFutoshiki(0,0);
->>>>>>> sol_sem_poda
 
         free_data();
     }
     return 0;
 }
-;
 
 bool SolveFutoshiki(int x, int y){
     printf("Estado atual: (analisando (%d, %d) )\n", x, y);

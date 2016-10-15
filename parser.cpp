@@ -93,21 +93,12 @@ void init_restrictions_map(void)
     int x1, y1, x2, y2;
 
     /*aloca as matrizes que representam restricoes nas mesmas linhas e nas mesmas colunas*/
-<<<<<<< HEAD
-    line_restriction = (uint8_t **) malloc(size_current_test * sizeof(uint8_t *));
-    columns_restriction = (uint8_t **) malloc(size_current_test * sizeof(uint8_t *));
-
-    for (i = 0; i < size_current_test; i++) {
-        line_restriction[i] = (uint8_t *) malloc(size_current_test * sizeof(uint8_t));
-        columns_restriction[i] = (uint8_t *) malloc(size_current_test * sizeof(uint8_t));
-=======
     line_restriction = (int **) malloc(size_current_test * sizeof(int *));
     columns_restriction = (int **) malloc(size_current_test * sizeof(int *));
 
     for (i = 0; i < size_current_test; i++) {
         line_restriction[i] = (int *) malloc(size_current_test * sizeof(int));
         columns_restriction[i] = (int *) malloc(size_current_test * sizeof(int));
->>>>>>> sol_sem_poda
 
         for (j = 0; j < size_current_test; j++) {
             line_restriction[i][j] = NO_RESTRICTION;
@@ -117,19 +108,6 @@ void init_restrictions_map(void)
 
     for (i = 0; i < number_current_restrictions; i++) {
         fscanf(stream_input, "%d %d %d %d", &x1, &y1, &x2, &y2);
-<<<<<<< HEAD
-        printf("%d %d %d %d\n", x1-1, y1-1, x2-1, y2-1);
-        if (x1 == x2) { /* a restricao esta na mesma _linha_ */
-            if (y1 > y2)
-                line_restriction[x1 - 1][y1 - 1] = GREAT_RESTRICTION;
-            else
-                line_restriction[x1 - 1][y1 - 1] = LESS_RESTRICTION;
-        } else if (y1 == y2) { /* a restricao esta na mesma _coluna_ */
-            if (x1 > x2)
-                columns_restriction[x1 - 1][y1 - 1] = GREAT_RESTRICTION;
-            else
-                columns_restriction[x1 - 1][y1 - 1] = LESS_RESTRICTION;
-=======
         printf("%d %d %d %d\n", x1, y1, x2, y2);
         if (x1 == x2) { /* a restricao esta na mesma coluna */
             if (y1 > y2)    line_restriction[x1 - 1][y2 - 1] = 1;
@@ -139,7 +117,6 @@ void init_restrictions_map(void)
         else if (y1 == y2) { /* a restricao esta na mesma linha */
             if (x1 > x2)    columns_restriction[x2 - 1][y1 - 1] = 1;
             else            columns_restriction[x1 - 1][y1 - 1] = -1;
->>>>>>> sol_sem_poda
         }
     }
 }
