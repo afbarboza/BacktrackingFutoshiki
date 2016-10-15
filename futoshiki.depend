@@ -15,7 +15,7 @@
 	"parser.h"
 	"futoshiki.h"
 
-1476546014 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/main.cpp
+1476550388 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/main.cpp
 	<iostream>
 	"futoshiki.h"
 	"parser.h"
@@ -24,11 +24,11 @@
 	<cstdio>
 	<cstdlib>
 
-1476547211 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/parser.cpp
+1476550228 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/parser.cpp
 	"parser.h"
 	"futoshiki.h"
 
-1476546912 /home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/futoshiki.h
+1476549503 /home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/futoshiki.h
 	<cstdio>
 	<cstdint>
 	<cstdlib>
@@ -36,6 +36,6 @@
 1476503258 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/futoshiki.cpp
 	"futoshiki.h"
 
-1476547158 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/restrictions.cpp
+1476549503 source:/home/alex/Documentos/USP/aa/futoshiki/futoshiki/BacktrackingFutoshiki/restrictions.cpp
 	"futoshiki.h"
 

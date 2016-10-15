@@ -33,24 +33,15 @@ int main(void)
         printf("Tabuleiro:\n");
         for (int i = 0; i < size_current_test; i++) {
             for (int j = 0; j < size_current_test; j++) {
-                if (play_matrix[i][j] == 0)
-                    play_matrix[i][j] = 7;
-
                 printf("%d \t", play_matrix[i][j]);
             }
             printf("\n");
         }
 
         //getchar();
-        init_restrictions_map();
+        //init_restrictions_map();
         init_lines_map();
         init_columns_map();
-
-        int val, l, c;
-        printf("restriction: <value> <line> <column>\n");
-        scanf("%d %d %d", &val, &l, &c);
-        if (exist_less_greater(val, l, c) == true)
-            cout << "hey... you cannot put these value there.\n" << endl;
 
         printf("\nMapa de linhas:\n");
         for (int i = 0; i < size_current_test; i++) {
@@ -68,21 +59,21 @@ int main(void)
             printf("\n");
         }
 
-        printf("\nRestrições de linhas:\n");
+        /*printf("\nRestrições de linhas:\n");
         for (int i = 0; i < size_current_test; i++) {
             for (int j = 0; j < size_current_test; j++) {
                 printf("%d \t", line_restriction[i][j]);
             }
             printf("\n");
-        }
+        }*/
 
-        printf("\nRestrições de colunas:\n");
+        /*printf("\nRestrições de colunas:\n");
         for (int i = 0; i < size_current_test; i++) {
             for (int j = 0; j < size_current_test; j++) {
                 printf("%d \t", columns_restriction[i][j]);
             }
             printf("\n");
-        }
+        }*/
 
         getchar();
 

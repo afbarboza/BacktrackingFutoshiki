@@ -117,7 +117,7 @@ void init_restrictions_map(void)
         else if (y1 == y2) { /* a restricao esta na mesma linha */
             if (x1 > x2)    columns_restriction[x2 - 1][y1 - 1] = 1;
             else            columns_restriction[x1 - 1][y1 - 1] = -1;
-        }
+        } // a restricao pode ser de maior ou menor.
     }
 }
 
