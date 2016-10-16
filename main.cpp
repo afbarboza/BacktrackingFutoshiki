@@ -55,6 +55,7 @@ bool SolveFutoshiki(int x, int y){
     getchar();
     */
 
+
     // Se foi até a última casa e tentou executar na linha de baixo significa que o jogo terminou com sucesso
     if (y == size_current_test) return true;
 

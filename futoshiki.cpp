@@ -1,10 +1,18 @@
 #include "futoshiki.h"
 #include <list>
+#include <climits>
 
 /*dado uma linha e uma coluna, retorna o indice dessa celula no vetor de dominios */
 #define GET_INDEX_DOMAIN(i, j)  ((i * size_current_test) + j)
 
-extern int size_current_test;
+extern int  number_case_test;
+extern int  size_current_test;
+extern int  number_current_restrictions;
+extern int  **play_matrix;
+extern bool **lines_map;
+extern bool **columns_map;
+extern int  **line_restriction;
+extern int  **columns_restriction;
 
 /* indice para variavel mais restrita */
 int most_constrained_variable = 0;
@@ -61,7 +69,7 @@ void init_domain_variables(void)
 */
 int apply_heuristic_mrv(int *next_i, int *next_j)
 {
-    int minimum_domain = 10;
+    int minimum_domain = INT_MAX;
 
     *next_i = -1;
     *next_j = -1;
@@ -101,6 +109,8 @@ int apply_heuristic_mrv(int *next_i, int *next_j)
                 set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->remove(value_assigned);
         }
     }
+
+
 
     return value_assigned;
 }
