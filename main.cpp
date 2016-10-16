@@ -1,9 +1,4 @@
 #include <iostream>
-<<<<<<< HEAD
-
-#include "futoshiki.h"
-=======
->>>>>>> 1684a576beaca6b08323074646cf8fc6a72bb22f
 #include "parser.h"
 
 #define NO_RESTRICTION      0 // 0 = Sem poda, 1 = Verif. adiante, 2 = Verfif. adiante e MVR
@@ -37,58 +32,6 @@ int main(void)
 
         init_play_matrix();
         init_restrictions_map();
-
-<<<<<<< HEAD
-        printf("Estado inicial:\n");
-        printf("Tabuleiro:\n");
-        for (int i = 0; i < size_current_test; i++) {
-            for (int j = 0; j < size_current_test; j++) {
-                printf("%d \t", play_matrix[i][j]);
-            }
-            printf("\n");
-        }
-
-        //getchar();
-        //init_restrictions_map();
-        init_lines_map();
-        init_columns_map();
-
-        printf("\nMapa de linhas:\n");
-        for (int i = 0; i < size_current_test; i++) {
-            for (int j = 0; j < size_current_test; j++) {
-                printf("%d \t", lines_map[i][j]? 1 : 0);
-            }
-            printf("\n");
-        }
-
-        printf("\nMapa de colunas:\n");
-        for (int i = 0; i < size_current_test; i++) {
-            for (int j = 0; j < size_current_test; j++) {
-                printf("%d \t", columns_map[i][j]? 1 : 0);
-            }
-            printf("\n");
-        }
-
-        /*printf("\nRestrições de linhas:\n");
-        for (int i = 0; i < size_current_test; i++) {
-            for (int j = 0; j < size_current_test; j++) {
-                printf("%d \t", line_restriction[i][j]);
-            }
-            printf("\n");
-        }*/
-
-        /*printf("\nRestrições de colunas:\n");
-        for (int i = 0; i < size_current_test; i++) {
-            for (int j = 0; j < size_current_test; j++) {
-                printf("%d \t", columns_restriction[i][j]);
-            }
-            printf("\n");
-        }*/
-
-        getchar();
-=======
-        //PrintStateZero();
->>>>>>> 1684a576beaca6b08323074646cf8fc6a72bb22f
 
         SolveFutoshiki(0,0);
 
