@@ -44,6 +44,8 @@ int get_number_restriction(void)
     return number_current_restrictions;
 }
 
+// Seta valores iniciais 'lines_map' e 'columns_map', então precisa ser
+// executado após 'init_lines_map' e 'init_columns_map'
 void init_play_matrix(void)
 {
     register int i, j;
@@ -108,7 +110,7 @@ void init_restrictions_map(void)
 
     for (i = 0; i < number_current_restrictions; i++) {
         fscanf(stream_input, "%d %d %d %d", &x1, &y1, &x2, &y2);
-        printf("%d %d %d %d\n", x1, y1, x2, y2);
+        //printf("%d %d %d %d\n", x1, y1, x2, y2);
         if (x1 == x2) { /* a restricao esta na mesma coluna */
             if (y1 > y2)    line_restriction[x1 - 1][y2 - 1] = 1;
             else            line_restriction[x1 - 1][y1 - 1] = -1;
