@@ -1,16 +1,20 @@
 #include "parser.h"
-#include "futoshiki.h"
+
+int tipo_de_busca = 1; // 0 = Sem poda, 1 = Verif. adiante, 2 = Verfif. adiante e MVR
 
 FILE *stream_input = NULL;
 
+int  number_total_test = 0;
 int  number_case_test = 0;
 int  size_current_test = 0;
 int  number_current_restrictions = 0;
+int  atribuicoes = 0;
 int  **play_matrix = NULL;
 bool **lines_map = NULL;
 bool **columns_map = NULL;
 int  **line_restriction = NULL;
 int  **columns_restriction = NULL;
+int ***verif_ahead = NULL;
 
 #define END_OF_TESTS -1
 
@@ -21,6 +25,7 @@ int get_number_tests(void)
     }
 
     fscanf(stream_input, "%d", &number_case_test);
+    number_total_test = number_case_test;
     return number_case_test;
 }
 
@@ -59,6 +64,13 @@ void init_play_matrix(void)
             if (tmp != 0){
                 lines_map[tmp-1][i] = true;
                 columns_map[tmp-1][j] = true;
+
+                if (tipo_de_busca >= 1){
+                    for (int k = 0; k < size_current_test; k++){
+                        if(j != 0+k)verif_ahead[i][0+k][tmp-1] = 0;
+                        if(i != 0+k)verif_ahead[0+k][j][tmp-1] = 0;
+                    }
+                }
             }
             play_matrix[i][j] = tmp;
         }
@@ -103,8 +115,8 @@ void init_restrictions_map(void)
         columns_restriction[i] = (int *) malloc(size_current_test * sizeof(int));
 
         for (j = 0; j < size_current_test; j++) {
-            line_restriction[i][j] = NO_RESTRICTION;
-            columns_restriction[i][j] = NO_RESTRICTION;
+            line_restriction[i][j] = 0;
+            columns_restriction[i][j] = 0;
         }
     }
 
@@ -138,4 +150,19 @@ void free_data(void)
     free(columns_map);
     free(line_restriction);
     free(columns_restriction);
+}
+
+void init_verif_ahead(void)
+{
+    register int i, j, k;
+    verif_ahead = (int ***) malloc(size_current_test * sizeof(int **));
+    for (i = 0; i < size_current_test; i++) {
+        verif_ahead[i] = (int **) malloc(size_current_test * sizeof(int *));
+        for (j = 0; j < size_current_test; j++) {
+            verif_ahead[i][j] = (int *) malloc(size_current_test * sizeof(int));
+            for (k = 0; k < size_current_test; k++){
+                verif_ahead[i][j][k] = k+1;
+            }
+        }
+    }
 }

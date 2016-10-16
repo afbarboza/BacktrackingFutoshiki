@@ -57,4 +57,9 @@ void init_restrictions_map(void);
  */
 void free_data(void);
 
+/**
+ *  inicializa a matriz 3d verif_ahead usada na verficação adiante
+ */
+void init_verif_ahead(void);
+
 #endif // PARSER_H_INCLUDED
