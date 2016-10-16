@@ -32,7 +32,12 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="futoshiki.cpp" />
+		<Unit filename="futoshiki.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="parser.cpp" />
+		<Unit filename="parser.h" />
+		<Unit filename="restrictions.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

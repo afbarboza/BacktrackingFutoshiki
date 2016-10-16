@@ -35,6 +35,15 @@ extern int **line_restriction;
 // columns_restriction - representa as restricoes de menor presentes nas colunas
 extern int **columns_restriction;
 
+
+
 bool exist_less_greater(uint8_t value, int line, int column);
+
+/**
+* init_domain_variables - inicializa o dominio de cada variavel
+* A cada nivel de recursao do backtracking, esses dominios vao diminuindo
+* e heuristicas vao sendo aplicados sobre esse dominio.
+*/
+void init_domain_variables(void);
 
 #endif // FUTOSHIKI_H_INCLUDED

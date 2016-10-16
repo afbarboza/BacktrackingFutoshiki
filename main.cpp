@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "futoshiki.h"
 #include "parser.h"
 
@@ -12,6 +13,7 @@ extern bool **lines_map;
 extern bool **columns_map;
 extern int  **line_restriction;
 extern int  **columns_restriction;
+
 
 
 bool SolveFutoshiki(int x, int y);
