@@ -59,10 +59,10 @@ bool validate_play_matrix(void)
             bool repeated_same_line = look_repetition_line(i, play_matrix[i][j]);
             bool repeated_same_column = look_repetition_column(j, play_matrix[i][j]);
             if (repeated_same_column || repeated_same_line)
-                return INVALID_MATRIX;
+                return false;
         }
     }
-    return VALID_MATRIX;
+    return true;
 }
 
 
@@ -95,25 +95,26 @@ static bool check_inequality_columns(uint8_t value, int line, int column)
 *   em uma dada linha @line e coluna @column sem violar as condicoes
 *   de maior/menor do tabuleiro.
 */
-bool exist_less_greater(uint8_t value, int line, int column)
+bool exist_less_greater(int value, int x, int y)
 {
-    bool inequality_line = false;
-    bool inequality_column = false;
-
-    /*valores na linha zero e coluna zero nao tem restricoes*/
-    if (line == 0 && column == 0)
-        return false;
-
-    /*cannot check for backward index lesser than 0*/
-    if (line == 0) {
-        return check_inequality_lines(value, line, column);
+            // Checa as restrições de maior ou menor
+    bool restricted = false;
+    if (x > 0){
+        if ( (line_restriction[y][x-1] ==  1 && play_matrix[y][x-1] < value) ||
+            (line_restriction[y][x-1] == -1 && play_matrix[y][x-1] > value) )
+            {
+                    //printf("Restricao L %d em (%d, %d)\n", line_restriction[y][x-1], x-1, y);
+                restricted = true;
+            }
     }
 
-    if (column == 0) {
-        return check_inequality_columns(value, line, column);
+    if (y > 0){
+        if ( (columns_restriction[y-1][x] ==  1 && play_matrix[y-1][x] < value) ||
+            (columns_restriction[y-1][x] == -1 && play_matrix[y-1][x] > value) )
+             {
+                    //printf("Restricao C %d em (%d, %d)\n", columns_restriction[y-1][x], x, y-1);
+                 restricted = true;
+             }
     }
-    inequality_column = check_inequality_lines(value, line, column);
-    inequality_line = check_inequality_columns(value, line, column);
-
-    return (inequality_line || inequality_column);
+    return restricted;
 }

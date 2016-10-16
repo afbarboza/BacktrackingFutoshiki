@@ -1,5 +1,6 @@
 #include "futoshiki.h"
 #include <list>
+#include <cstdio>
 #include <climits>
 
 /*dado uma linha e uma coluna, retorna o indice dessa celula no vetor de dominios */
@@ -30,6 +31,7 @@ int size_most_constrained = size_current_test;
 struct var_domain {
     int             x;
     int             y;
+    bool            have_assignment;
     std::list<int>  *domain_list;
 };
 
@@ -46,6 +48,7 @@ void init_domain_variables(void)
         for (int j = 0; j < size_current_test; j++) {
             set_domains[GET_INDEX_DOMAIN(i, j)].x = i;
             set_domains[GET_INDEX_DOMAIN(i, j)].y = j;
+            set_domains[GET_INDEX_DOMAIN(i, j)].have_assignment = false;
             set_domains[(GET_INDEX_DOMAIN(i, j))].domain_list = new list< int >();
             for (int d = 1; d <= size_current_test; d++) {
                 set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->push_back(d);
@@ -79,8 +82,8 @@ int apply_heuristic_mrv(int *next_i, int *next_j)
         for (int j = 0; j < size_current_test; j++) {
             int current_size = set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->size();
             bool is_list_empty = set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->empty();
-
-            if (current_size < minimum_domain && !is_list_empty) {
+            bool have_assignment = set_domains[GET_INDEX_DOMAIN(i, j)].have_assignment;
+            if (current_size <= minimum_domain && !is_list_empty && !have_assignment) {
                 *next_i = i;
                 *next_j = j;
                 minimum_domain = current_size;
@@ -99,6 +102,7 @@ int apply_heuristic_mrv(int *next_i, int *next_j)
     //int value_assigned = set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].domain_list->pop_back();
     int value_assigned = set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].domain_list->back();
     set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].domain_list->pop_back();
+    set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].have_assignment = true;
 
     for (int i = 0; i < size_current_test; i++) {
         for (int j = 0; j < size_current_test; j++) {
@@ -111,12 +115,13 @@ int apply_heuristic_mrv(int *next_i, int *next_j)
     }
 
 
-
+    printf("value assigned: %d\n", value_assigned);
     return value_assigned;
 }
 
 void restore_domain_mrv(int value, int line, int column)
 {
+    set_domains[GET_INDEX_DOMAIN(line, column)].have_assignment = false;
     for (int i = 0; i < size_current_test; i++) {
         for (int j = 0; j < size_current_test; j++) {
             if (i == line && j == column)

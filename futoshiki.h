@@ -35,9 +35,9 @@ extern int **line_restriction;
 // columns_restriction - representa as restricoes de menor presentes nas colunas
 extern int **columns_restriction;
 
+bool exist_less_greater(int value, int line, int column);
 
-
-bool exist_less_greater(uint8_t value, int line, int column);
+bool validate_play_matrix(void);
 
 /**
 * init_domain_variables - inicializa o dominio de cada variavel
@@ -45,5 +45,9 @@ bool exist_less_greater(uint8_t value, int line, int column);
 * e heuristicas vao sendo aplicados sobre esse dominio.
 */
 void init_domain_variables(void);
+
+int apply_heuristic_mrv(int *next_i, int *next_j);
+
+void restore_domain_mrv(int value, int line, int column);
 
 #endif // FUTOSHIKI_H_INCLUDED
