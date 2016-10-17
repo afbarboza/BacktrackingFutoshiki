@@ -48,7 +48,7 @@ bool check_complete_assignment(void)
 {
     for (int i = 0; i < size_current_test; i++) {
         for (int j = 0; j < size_current_test; j++) {
-            if (play_matrix[i][j] == 0)
+            if (play_matrix[i][j] == 0 || !check_assigned_variable(i, j))
                 return false;
         }
     }
@@ -65,20 +65,10 @@ bool SolveFutoshiki(int x, int y) {
 
     // Aplica uma heuristica sobre o tabuleiro, procurando celulas com o menor numero de variaveis possiveis
     // A heuristia serve como uma 'dica', nao necessariamente x e y serao alterados;
-    apply_heuristic_mrv(&x, &y);
-
-    if (x >= size_current_test || y >= size_current_test) {
-        printf("overflow condition\n");
-        if (check_complete_assignment() != true)
-            select_unassigned_variable(&x, &y);
-    }
-
-    // Se foi até a última casa e tentou executar na linha de baixo significa que o jogo terminou com sucesso
-    if (play_matrix[y][x] != 0){
-        printf("variable assigned. trying again...\n");
-        if (check_complete_assignment() != true)
-            select_unassigned_variable(&x, &y);
-    }
+    // O retorno da funcao serve para indicar se um backtracking deve ser efetuado.
+    bool valid_domains = apply_heuristic_mrv(&x, &y);
+    if (!valid_domains)
+        return false;
 
     // Procura número que caiba na casa atual, indo de 1 a 'D'
     bool result = false;

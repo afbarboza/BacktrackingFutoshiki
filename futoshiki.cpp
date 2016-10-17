@@ -81,12 +81,14 @@ void init_domain_variables(void)
 *           Se -1 for retornado, o algoritmo deve fazer backtracking. (MVR puro)
 *           Se forward checking for aplicado, o algoritmo nao retornara nunca -1.
 */
-void apply_heuristic_mrv(int *x, int *y)
+bool apply_heuristic_mrv(int *x, int *y)
 {
     int minimum_domain = INT_MAX;
 
     int next_i = -1;
     int next_j = -1;
+
+    bool all_domains_empty = true;
 
     /* captura a celula com o menor numero de valores possiveis */
     for (int i = 0; i < size_current_test; i++) {
@@ -104,6 +106,7 @@ void apply_heuristic_mrv(int *x, int *y)
                 next_i = i;
                 next_j = j;
                 minimum_domain = current_size;
+                all_domains_empty = false;
             }
         }
     }
@@ -112,6 +115,7 @@ void apply_heuristic_mrv(int *x, int *y)
         *x = next_i;
         *y = next_j;
     }
+    return all_domains_empty;
 }
 
 /**
@@ -161,4 +165,9 @@ void select_unassigned_variable(int *x, int *y)
             }
         }
     }
+}
+
+bool check_assigned_variable(int x, int y)
+{
+    return (set_domains[GET_INDEX_DOMAIN(x, y)].have_assignment);
 }
