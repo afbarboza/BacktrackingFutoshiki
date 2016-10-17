@@ -46,8 +46,12 @@ bool validate_play_matrix(void);
 */
 void init_domain_variables(void);
 
-int apply_heuristic_mrv(int *next_i, int *next_j);
+void apply_heuristic_mrv(int *next_i, int *next_j);
 
 void restore_domain_mrv(int value, int line, int column);
+
+void restrict_search_space(int value_assigned, int x, int y);
+
+void select_unassigned_variable(int *x, int *y);
 
 #endif // FUTOSHIKI_H_INCLUDED

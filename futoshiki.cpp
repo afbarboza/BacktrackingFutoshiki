@@ -39,6 +39,21 @@ using namespace std;
 
 struct var_domain *set_domains = NULL;
 
+static void init_valid_domains(int i, int j)
+{
+    if (play_matrix[i][j] != 0) { /** checa valores iniciais e imutaveis da celula - entrada */
+        set_domains[GET_INDEX_DOMAIN(i, j)].have_assignment = true;
+        set_domains[(GET_INDEX_DOMAIN(i, j))].domain_list = NULL;
+    } else { /** atribui um dominio a cada celula*/
+        set_domains[GET_INDEX_DOMAIN(i, j)].have_assignment = false;
+        set_domains[(GET_INDEX_DOMAIN(i, j))].domain_list = new list< int >();
+        for (int d = 1; d <= size_current_test; d++) {
+                if (!lines_map[d-1][i] && !columns_map[d-1][j])
+                    set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->push_back(d);
+        }
+    }
+}
+
 void init_domain_variables(void)
 {
     int n_cells = size_current_test * size_current_test;
@@ -48,11 +63,7 @@ void init_domain_variables(void)
         for (int j = 0; j < size_current_test; j++) {
             set_domains[GET_INDEX_DOMAIN(i, j)].x = i;
             set_domains[GET_INDEX_DOMAIN(i, j)].y = j;
-            set_domains[GET_INDEX_DOMAIN(i, j)].have_assignment = false;
-            set_domains[(GET_INDEX_DOMAIN(i, j))].domain_list = new list< int >();
-            for (int d = 1; d <= size_current_test; d++) {
-                set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->push_back(d);
-            }
+            init_valid_domains(i, j);
         }
     }
 }
@@ -70,53 +81,57 @@ void init_domain_variables(void)
 *           Se -1 for retornado, o algoritmo deve fazer backtracking. (MVR puro)
 *           Se forward checking for aplicado, o algoritmo nao retornara nunca -1.
 */
-int apply_heuristic_mrv(int *next_i, int *next_j)
+void apply_heuristic_mrv(int *x, int *y)
 {
     int minimum_domain = INT_MAX;
 
-    *next_i = -1;
-    *next_j = -1;
+    int next_i = -1;
+    int next_j = -1;
 
     /* captura a celula com o menor numero de valores possiveis */
     for (int i = 0; i < size_current_test; i++) {
         for (int j = 0; j < size_current_test; j++) {
+            // trata variaveis que nao podem ser alteradas no decorrer do jogo
+            if (set_domains[GET_INDEX_DOMAIN(i, j)].domain_list == NULL)
+                continue;
+
             int current_size = set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->size();
             bool is_list_empty = set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->empty();
             bool have_assignment = set_domains[GET_INDEX_DOMAIN(i, j)].have_assignment;
-            if (current_size <= minimum_domain && !is_list_empty && !have_assignment) {
-                *next_i = i;
-                *next_j = j;
+
+            // senao, selecionamos ela como a celula que ira receber a proxima atribuicao
+            if (current_size < minimum_domain && !is_list_empty && !have_assignment) {
+                next_i = i;
+                next_j = j;
                 minimum_domain = current_size;
             }
         }
     }
 
-    if (*next_i == -1 || *next_j == -1)
-        return -1; // nenhum valor pode ser atribuido - o algoritmo deve efetuar backtracking
+    if (next_i != -1 || next_j != -1) {
+        *x = next_i;
+        *y = next_j;
+    }
+}
 
-    /**
-    * neste trecho de codigo ocorre a poda do dominio de cada variavel
-    * ao atribuir @value_assigned para uma celula (i,j), devemos retirar das celulas (i,n)  ou (n, j)
-    * a possibilidade de atribuir @value_assigned.
-    */
-    //int value_assigned = set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].domain_list->pop_back();
-    int value_assigned = set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].domain_list->back();
-    set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].domain_list->pop_back();
-    set_domains[GET_INDEX_DOMAIN(*next_i, *next_j)].have_assignment = true;
-
+/**
+ * neste trecho de codigo ocorre a poda do dominio de cada variavel
+ * ao atribuir @value_assigned para uma celula (i,j), devemos retirar das celulas (i,n)  ou (n, j)
+ * a possibilidade de atribuir @value_assigned.
+ */
+void restrict_search_space(int value_assigned, int x, int y)
+{
+    set_domains[GET_INDEX_DOMAIN(x, y)].have_assignment = true;
     for (int i = 0; i < size_current_test; i++) {
         for (int j = 0; j < size_current_test; j++) {
-            if (i == *next_i && j == *next_j)
+            if (set_domains[GET_INDEX_DOMAIN(i, j)].domain_list == NULL)
                 continue;
-            else if (i == *next_i || i== *next_j)
+
+            if (i == x || j == y)
                 // celulas na mesma linha ou na mesma coluna nao poderao receber o valor atribuido para aquela celua - poda
                 set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->remove(value_assigned);
         }
     }
-
-
-    printf("value assigned: %d\n", value_assigned);
-    return value_assigned;
 }
 
 void restore_domain_mrv(int value, int line, int column)
@@ -124,10 +139,26 @@ void restore_domain_mrv(int value, int line, int column)
     set_domains[GET_INDEX_DOMAIN(line, column)].have_assignment = false;
     for (int i = 0; i < size_current_test; i++) {
         for (int j = 0; j < size_current_test; j++) {
-            if (i == line && j == column)
+            if (set_domains[GET_INDEX_DOMAIN(i, j)].domain_list == NULL)
                 continue;
-            else if (i == line || j == column)
-                set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->push_back(value);
+
+                if (i == line || j == column)
+                    set_domains[GET_INDEX_DOMAIN(i, j)].domain_list->push_back(value);
+        }
+    }
+}
+
+void select_unassigned_variable(int *x, int *y)
+{
+    for (int i = 0; i < size_current_test; i++) {
+        for (int j = 0; j < size_current_test; j++) {
+            if (set_domains[GET_INDEX_DOMAIN(i, j)].domain_list == NULL)
+                continue;
+            if (!set_domains[GET_INDEX_DOMAIN(i, j)].have_assignment) {
+                *x = i;
+                *y = j;
+                return;
+            }
         }
     }
 }
