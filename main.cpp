@@ -15,8 +15,11 @@ extern bool **lines_map;
 extern bool **columns_map;
 extern int  **line_restriction;
 extern int  **columns_restriction;
+
 extern int ***verif_ahead;
 
+extern int **mvr;
+extern int *mvr_line_count;
 
 bool SolveFutoshiki (int x, int y);
 bool SetVerifAhead  (int x, int y, int i);
@@ -35,24 +38,24 @@ int main(void)
         get_size_test();
         get_number_restriction();
 
-        if (tipo_de_busca >= 1)
-            init_verif_ahead();
+        if (tipo_de_busca >= 1) init_verif_ahead();
+        if (tipo_de_busca >= 2) init_mvr();
 
         init_lines_map();
         init_columns_map();
+
 
         init_play_matrix();
         init_restrictions_map();
 
         atribuicoes = 0;
 
-        //PrintStateZero();
-
         printf("%d\n", number_total_test - number_case_test);
         if(SolveFutoshiki(0,0)) PrintResult();
 
-        if(atribuicoes <= 1000000) printf("no de atribuicoes: %d\n\n", atribuicoes);
-        else printf("Numero de atribuicoes excede limite maximo\n");
+        if(atribuicoes >= 1000000)
+            //printf("no de atribuicoes: %d\n", atribuicoes);
+            printf("Numero de atribuicoes excede limite maximo\n");
 
         free_data();
     }
@@ -61,9 +64,6 @@ int main(void)
 
 // X e Y indo de '0' a 'D - 1'
 bool SolveFutoshiki(int x, int y){
-    //printf("\nEstado atual: (analisando (%d, %d) )\n", x, y);
-    //PrintCurrent();
-
     //Conta quantas atribuições já foram feitas e para se chegar a 10^6
     atribuicoes++;
     if (atribuicoes > 1000000) return false;
@@ -79,31 +79,58 @@ bool SolveFutoshiki(int x, int y){
 
     // Procura número que caiba na casa atual, indo de 1 a 'D'
     bool result = false;
+    if(tipo_de_busca >= 2) mvr_line_count[y]--;
     for (int i = 1; i <= size_current_test; i++){
 
         // Checa se o nº 'i' atual já está presente na coluna 'x' ou na linha 'y'
         bool alreadyPresent;
-        if (tipo_de_busca == 0) alreadyPresent = (!lines_map[i-1][y] && !columns_map[i-1][x]);
+        if (tipo_de_busca <= 0) alreadyPresent = (!lines_map[i-1][y] && !columns_map[i-1][x]);
         else alreadyPresent = (verif_ahead[y][x][i-1] > 0);
 
         if (alreadyPresent) {
             // Checa as restrições de maior ou menor
             bool restricted = false;
+            // Checa se uma casa não foi ainda preenchida para descartá-la da checagem de restirções
+            bool mvrCheck = true;
+
             if (x > 0){
-                if ( (line_restriction[y][x-1] ==  1 && play_matrix[y][x-1] < i) ||
-                     (line_restriction[y][x-1] == -1 && play_matrix[y][x-1] > i) )
+                if (tipo_de_busca >= 2 ) mvrCheck = (play_matrix[y][x-1] != 0);
+                if (  mvrCheck && (
+                     (line_restriction[y][x-1] ==  1 && play_matrix[y][x-1] < i) ||
+                     (line_restriction[y][x-1] == -1 && play_matrix[y][x-1] > i) ) )
                 {
-                    // printf("Restricao L %d em (%d, %d)\n", line_restriction[y][x-1], x-1, y);
                     restricted = true;
                 }
             }
 
             if (y > 0){
-                if ( (columns_restriction[y-1][x] ==  1 && play_matrix[y-1][x] < i) ||
-                     (columns_restriction[y-1][x] == -1 && play_matrix[y-1][x] > i) )
+                if (tipo_de_busca >= 2 ) mvrCheck = (play_matrix[y-1][x] != 0);
+                if (  mvrCheck && (
+                     (columns_restriction[y-1][x] ==  1 && play_matrix[y-1][x] < i) ||
+                     (columns_restriction[y-1][x] == -1 && play_matrix[y-1][x] > i) ) )
                 {
-                    // printf("Restricao C %d em (%d, %d)\n", columns_restriction[y-1][x], x, y-1);
                     restricted = true;
+                }
+            }
+
+            if (tipo_de_busca >= 2){
+                if (x < size_current_test-1){
+                    if (tipo_de_busca >= 2 ) mvrCheck = (play_matrix[y][x+1] != 0);
+                    if (  mvrCheck && (
+                         (line_restriction[y][x] ==  1 && play_matrix[y][x+1] > i) ||
+                         (line_restriction[y][x] == -1 && play_matrix[y][x+1] < i) ) )
+                    {
+                        restricted = true;
+                    }
+                }
+                if (y < size_current_test-1){
+                    if (tipo_de_busca >= 2 ) mvrCheck = (play_matrix[y+1][x] != 0);
+                    if (  mvrCheck && (
+                         (columns_restriction[y][x] ==  1 && play_matrix[y+1][x] > i) ||
+                         (columns_restriction[y][x] == -1 && play_matrix[y+1][x] < i) ) )
+                    {
+                        restricted = true;
+                    }
                 }
             }
 
@@ -111,7 +138,11 @@ bool SolveFutoshiki(int x, int y){
             if(!restricted){
                 play_matrix[y][x]   = i;
 
-                if (tipo_de_busca == 0){
+                if (tipo_de_busca >= 2) {
+                    mvr[y][x]--;
+                }
+
+                else if (tipo_de_busca == 0){
                     lines_map  [i-1][y] = true;
                     columns_map[i-1][x] = true;
                 }
@@ -120,9 +151,28 @@ bool SolveFutoshiki(int x, int y){
                 bool verifyAhead = false;
                 if (tipo_de_busca >= 1) verifyAhead = SetVerifAhead(x, y, i);
 
-                if (tipo_de_busca == 0 || verifyAhead){
+                if (tipo_de_busca <= 0 || (tipo_de_busca == 1 && verifyAhead)){
                     if (x == (size_current_test -1))    result = SolveFutoshiki(0, y + 1);
                     else                                result = SolveFutoshiki(x + 1, y);
+                }
+
+                // Se a busca tem MVR, decidir qual a próxima casa a ser marcada
+                else if (tipo_de_busca >= 2 && verifyAhead){
+                    int smallest = size_current_test+1;
+                    int sX = 0, sY = 0;
+
+                    for (int a = 0; a < size_current_test && smallest > 1; a++){
+                        if (mvr_line_count[a] > 0){
+                            for (int b = 0; b < size_current_test && smallest > 1; b++){
+                                if (mvr[a][b] < smallest && play_matrix[a][b] == 0){
+                                    smallest = mvr[a][b];
+                                    sY = a;
+                                    sX = b;
+                                }
+                            }
+                        }
+                    }
+                    result = SolveFutoshiki(sX, sY);
                 }
             }
 
@@ -133,6 +183,10 @@ bool SolveFutoshiki(int x, int y){
                 }
                 else {
                     CleanVerifAhead(x, y);
+                    if (tipo_de_busca >= 2) {
+                        mvr[y][x] = count_mvr(y, x);
+                        if (play_matrix[y][x] > 0) mvr[y][x]++;
+                    }
                 }
             }
         }
@@ -142,9 +196,7 @@ bool SolveFutoshiki(int x, int y){
     // Se chegou até aqui então não achou nenhum número, e a disposição atual do tabuleiro não possui solução.
     // Assim, limpa a casa atual, reseta as variáveis correspondentes e retorna falso
     play_matrix[y][x] = 0;
-
-    //printf("Backtracking: (analisando (%d, %d))\n", x, y);
-    //PrintCurrent();
+    if (tipo_de_busca >= 2) mvr_line_count[y]++;
 
     return false;
 }
@@ -156,30 +208,43 @@ bool isValid(int x, int y){
     for (int i = 0; i < size_current_test; i++){
         if(verif_ahead[y][x][i] > 0) valid = true;
     }
-    //if (!valid) printf("\n(%d, %d) nao valida\n\n", x, y);
     return valid;
 }
 
 bool SetVerifAhead(int x, int y, int i){
     // Se alguém marcar stillValid como falso, busca com verificação adiante para
     bool stillValid = true;
+    int x2, y2;
 
-    for (int k = 1; k < size_current_test; k++){
-        if (x+k < size_current_test){
-            if(verif_ahead[y][x+k][i-1] == i) {
-                verif_ahead[y][x+k][i-1] = 0;
-                if (stillValid) stillValid = isValid(x+k, y);
+    if (tipo_de_busca <= 1){
+        x2 = x+1;
+        y2 = y+1;
+    }
+    else{
+        x2 = 0;
+        y2 = 0;
+    }
+
+    for (int k = 0; k < size_current_test; k++){
+        if (x2+k < size_current_test && x2+k != x){
+            if(verif_ahead[y][x2+k][i-1] == i) {
+                verif_ahead[y][x2+k][i-1] = 0;
+
+                if (tipo_de_busca >= 2) mvr[y][x2+k]--;
+                if (stillValid) stillValid = isValid(x2+k, y);
             }
             else
-                verif_ahead[y][x+k][i-1]--;
+                verif_ahead[y][x2+k][i-1]--;
         }
-        if (y+k < size_current_test) {
-            if(verif_ahead[y+k][x][i-1] == i){
-                verif_ahead[y+k][x][i-1] = 0;
-                if (stillValid) stillValid = isValid(x, y+k);
+        if (y2+k < size_current_test && y2+k != y) {
+            if(verif_ahead[y2+k][x][i-1] == i){
+                verif_ahead[y2+k][x][i-1] = 0;
+
+                if (tipo_de_busca >= 2) mvr[y2+k][x]--;
+                if (stillValid) stillValid = isValid(x, y2+k);
             }
             else
-                verif_ahead[y+k][x][i-1]--;
+                verif_ahead[y2+k][x][i-1]--;
         }
     }
 
@@ -187,20 +252,33 @@ bool SetVerifAhead(int x, int y, int i){
 }
 
 void CleanVerifAhead(int x, int y){
-    for (int k = 1; k < size_current_test; k++){
-        if (x+k < size_current_test){
-            if( verif_ahead[y][x+k][play_matrix[y][x] -1] == 0 )
-                verif_ahead[y][x+k][play_matrix[y][x] -1] = play_matrix[y][x];
+    int x2, y2;
+    if (tipo_de_busca <= 1){
+        x2 = x+1;
+        y2 = y+1;
+    } else{
+        x2 = 0;
+        y2 = 0;
+    }
 
-            else if (verif_ahead[y][x+k][play_matrix[y][x] -1] < 0)
-                     verif_ahead[y][x+k][play_matrix[y][x] -1]++;
+    for (int k = 0; k < size_current_test; k++){
+        if (x2+k < size_current_test && x2+k != x){
+            if( verif_ahead[y][x2+k][play_matrix[y][x] -1] == 0 ){
+                verif_ahead[y][x2+k][play_matrix[y][x] -1] = play_matrix[y][x];
+                if (tipo_de_busca >= 2) mvr[y][x2+k]++;
+            }
+
+            else if (verif_ahead[y][x2+k][play_matrix[y][x] -1] < 0)
+                     verif_ahead[y][x2+k][play_matrix[y][x] -1]++;
         }
-        if (y+k < size_current_test) {
-            if( verif_ahead[y+k][x][play_matrix[y][x] -1] == 0)
-                verif_ahead[y+k][x][play_matrix[y][x] -1] = play_matrix[y][x];
+        if (y2+k < size_current_test && y2+k != y) {
+            if( verif_ahead[y2+k][x][play_matrix[y][x] -1] == 0){
+                verif_ahead[y2+k][x][play_matrix[y][x] -1] = play_matrix[y][x];
+                if (tipo_de_busca >= 2) mvr[y2+k][x]++;
+            }
 
-            else if( verif_ahead[y+k][x][play_matrix[y][x] -1] < 0)
-                     verif_ahead[y+k][x][play_matrix[y][x] -1]++;
+            else if( verif_ahead[y2+k][x][play_matrix[y][x] -1] < 0)
+                     verif_ahead[y2+k][x][play_matrix[y][x] -1]++;
         }
     }
 }
@@ -214,11 +292,13 @@ void PrintStateZero(){
         for (int j = 0; j < size_current_test; j++) {
             if (tipo_de_busca == 0) printf("%d \t", play_matrix[i][j]);
             else{
+                if (tipo_de_busca >= 2) printf("(%d)", mvr[i][j]);
                 printf("%d {", play_matrix[i][j]);
                 for (int k = 0; k < size_current_test; k++){
                     printf("%d, ", verif_ahead[i][j][k]);
                 }
-                printf("}   ");
+                printf("}  ");
+
             }
         }
         printf("\n");
@@ -255,7 +335,15 @@ void PrintStateZero(){
         }
         printf("\n");
     }
-    getchar();
+
+    if (tipo_de_busca >= 2){
+        printf("\nMVR Linhas:\n");
+        for (int i = 0; i < size_current_test; i++) {
+            printf("%d \t", mvr_line_count[i]);
+        }
+        printf("\n");
+    }
+    //getchar();
 }
 
 void PrintCurrent(){
@@ -263,11 +351,12 @@ void PrintCurrent(){
         for (int j = 0; j < size_current_test; j++) {
             if (tipo_de_busca == 0) printf("%d \t", play_matrix[i][j]);
             else{
+                if (tipo_de_busca >= 2) printf("(%d)", mvr[i][j]);
                 printf("%d {", play_matrix[i][j]);
                 for (int k = 0; k < size_current_test; k++){
-                    printf("%d, ", verif_ahead[i][j][k]);
+                    printf("%d,", verif_ahead[i][j][k]);
                 }
-                printf("}   ");
+                printf("}  ");
             }
         }
         printf("\n");

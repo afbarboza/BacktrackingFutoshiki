@@ -62,4 +62,11 @@ void free_data(void);
  */
 void init_verif_ahead(void);
 
+/**
+ *  inicializa a matriz mvr
+ */
+void init_mvr(void);
+
+int count_mvr(int i, int j);
+
 #endif // PARSER_H_INCLUDED

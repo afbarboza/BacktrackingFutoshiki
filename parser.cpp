@@ -1,6 +1,9 @@
 #include "parser.h"
+#include <set>
 
-int tipo_de_busca = 1; // 0 = Sem poda, 1 = Verif. adiante, 2 = Verfif. adiante e MVR
+using namespace std;
+
+int tipo_de_busca = 2; // 0 = Sem poda, 1 = Verif. adiante, 2 = Verfif. adiante e MVR
 
 FILE *stream_input = NULL;
 
@@ -14,7 +17,11 @@ bool **lines_map = NULL;
 bool **columns_map = NULL;
 int  **line_restriction = NULL;
 int  **columns_restriction = NULL;
+
 int ***verif_ahead = NULL;
+
+int **mvr = NULL;
+int  *mvr_line_count = NULL;    // Conta quantas casas ainda não foram preenchidas em uma certa linha
 
 #define END_OF_TESTS -1
 
@@ -49,8 +56,7 @@ int get_number_restriction(void)
     return number_current_restrictions;
 }
 
-// Seta valores iniciais 'lines_map' e 'columns_map', então precisa ser
-// executado após 'init_lines_map' e 'init_columns_map'
+// Atualiza valores das outras matrizes, por isso precisa ser a última função init chamada
 void init_play_matrix(void)
 {
     register int i, j;
@@ -61,18 +67,40 @@ void init_play_matrix(void)
         for (j = 0; j < size_current_test; j++) {
             int tmp;
             fscanf(stream_input, "%d", &tmp);
+            play_matrix[i][j] = tmp;
+        }
+    }
+
+    for (i = 0; i < size_current_test; i++) {
+        for (j = 0; j < size_current_test; j++) {
+            int tmp = play_matrix[i][j];
+
             if (tmp != 0){
                 lines_map[tmp-1][i] = true;
                 columns_map[tmp-1][j] = true;
 
                 if (tipo_de_busca >= 1){
                     for (int k = 0; k < size_current_test; k++){
-                        if(j != 0+k)verif_ahead[i][0+k][tmp-1] = 0;
-                        if(i != 0+k)verif_ahead[0+k][j][tmp-1] = 0;
+                        if(j != 0+k){
+                            if (verif_ahead[i][0+k][tmp-1] > 0) verif_ahead[i][0+k][tmp-1] = 0;
+                            else                                verif_ahead[i][0+k][tmp-1]--;
+
+                            if (tipo_de_busca >= 2) mvr[i][0+k] = count_mvr(i, 0+k);
+                        }
+                        if(i != 0+k){
+                            if (verif_ahead[0+k][j][tmp-1] > 0) verif_ahead[0+k][j][tmp-1] = 0;
+                            else                                verif_ahead[0+k][j][tmp-1]--;
+
+                            if (tipo_de_busca >= 2) mvr[0+k][j] = count_mvr(0+k, j);
+                        }
                     }
                 }
             }
-            play_matrix[i][j] = tmp;
+
+            if (tmp > 0 && tipo_de_busca >= 2){
+                mvr_line_count[i]--;
+                mvr[i][j] = count_mvr(i, j);
+            }
         }
     }
 }
@@ -165,4 +193,30 @@ void init_verif_ahead(void)
             }
         }
     }
+}
+
+void init_mvr(void)
+{
+    register int i, j;
+    mvr = (int **) malloc(size_current_test * sizeof(int *));
+    for (i = 0; i < size_current_test; i++) {
+        mvr[i] = (int *) malloc(size_current_test * sizeof(int));
+        for (j = 0; j < size_current_test; j++) {
+            mvr[i][j] = size_current_test;
+        }
+    }
+
+    mvr_line_count = (int *) malloc(size_current_test * sizeof(int));
+    for (i = 0; i < size_current_test; i++) {
+        mvr_line_count[i] = size_current_test;
+    }
+}
+
+int count_mvr(int i, int j){
+    int count = 0;
+    for (int k = 0; k < size_current_test; k++){
+        if (verif_ahead[i][j][k] > 0) count++;
+    }
+    if (play_matrix[i][j] > 0) count--;
+    return count;
 }
